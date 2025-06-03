@@ -165,4 +165,7 @@ fn main() {
     // 如果还是有歧义，可以继续增加，没有限制
     let longer_delimiter = r###"A string with "# in it. And even "##!"###;
     println!("{}", longer_delimiter);
+
+    // let _s: str = "hello world"; // error: expected `str`, found `&str`
+    let _s: &str = "hello world"; // error: expected `str`, found `&str`
 }
