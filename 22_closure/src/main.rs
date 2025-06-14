@@ -43,9 +43,9 @@
 //     f(3)
 // }
 
+// 课后作业
 use std::collections::HashMap;
 use std::hash::Hash;
-// 课后作业
 struct PageCache<K, V> {
     cache: HashMap<(K, V), String>,
 }
