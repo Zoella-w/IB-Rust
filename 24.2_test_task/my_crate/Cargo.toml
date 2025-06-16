@@ -1,0 +1,47 @@
+[package]
+name = "my_crate"
+version = "0.1.1"                                           # 每次发布前更新版本号
+edition = "2024"
+authors = ["Gabrielle <2695969122@qq.com>"]
+description = "一个演示 Rust 项目规范的库 crate"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/yourusername/my-lib-crate"
+documentation = "https://docs.rs/my-lib-crate"
+readme = "README.md"
+keywords = ["math", "template", "example"]
+categories = ["algorithms", "science"]
+
+# 是否启用自动发布
+publish = true
+
+[dependencies]
+
+# 为示例和工具添加的依赖
+[dependencies.structopt]
+version = "0.3"
+optional = true # 标记为可选
+
+# 开发依赖
+[dev-dependencies]
+criterion = "0.5"  # 基准测试
+assert_cmd = "2.0" # 测试示例输出
+
+# 基准测试配置
+[[bench]]
+name = "benchmark"
+harness = false
+
+# 示例配置
+[[example]]
+name = "basic_usage"
+
+# CLI 工具
+[[bin]]
+name = "cli"
+path = "src/bin/cli.rs"
+required-features = ["cli"] # 需要启用 cli 特性
+
+# 特性标志
+[features]
+cli = ["structopt"] # 启用 CLI 工具需要 structopt
+default = []

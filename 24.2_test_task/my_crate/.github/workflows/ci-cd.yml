@@ -1,0 +1,98 @@
+# CODEBLOCK21
+# .github/workflows/ci-cd.yml 完整内容
+
+name: Rust CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Run Tests and Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+          components: rustfmt, clippy
+
+      - name: Build project
+        run: cargo build --verbose
+
+      - name: Run unit tests
+        run: cargo test --lib --verbose
+
+      - name: Run integration tests
+        run: cargo test --test '*' --verbose
+
+      - name: Run documentation tests
+        run: cargo test --doc --verbose
+
+      - name: Check formatting
+        run: cargo fmt -- --check
+
+      - name: Run clippy
+        run: cargo clippy -- -D warnings
+
+      - name: Build documentation
+        run: |
+          cargo doc --no-deps
+          echo "Documentation generated"
+
+      - name: Run examples
+        run: cargo run --example basic_usage
+
+      - name: Run benchmarks (Nightly only)
+        if: ${{ false }} # 禁用非必要基准测试以节省时间
+        run: |
+          rustup toolchain install nightly
+          cargo +nightly bench
+
+  publish:
+    name: Publish to crates.io
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: crates-io
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Prepare for publish
+        run: |
+          # 设置版本信息
+          VERSION=$(awk -F '"' '/version/{print $2}' Cargo.toml)
+          echo "Current version: $VERSION"
+          echo "PUBLISH_VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Publish to crates.io
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          cargo login ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          cargo publish --verbose
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: "v${{ env.PUBLISH_VERSION }}"
+          tag_name: "v${{ env.PUBLISH_VERSION }}"
+          body: "Auto-generated release for version ${{ env.PUBLISH_VERSION }}"
+          prerelease: false

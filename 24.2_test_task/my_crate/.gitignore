@@ -1,0 +1,35 @@
+# CODEBLOCK20
+# .gitignore 文件内容
+
+# Rust 编译文件
+/target/
+**/*.rs.bk
+
+# Cargo 锁文件（库项目推荐包含）
+Cargo.lock
+
+# 环境文件
+.env
+
+# 开发工具缓存
+.direnv/
+
+# IDE 文件
+.idea/
+.vscode/
+*.swp
+*~
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 临时编译文件
+*.o
+*.out
+*.so
+*.dll
+*.a
+
+# 本地测试输出
+/output/
